@@ -10,7 +10,7 @@ import SwiftUI
 struct AddView: View {
     @Environment(\.dismiss) private var dismiss
     
-    @State private var name: String = ""
+    @State private var name: String = "New item name"
     @State private var type: String = "Personal"
     @State private var amount: Double = 0.0
     
@@ -21,22 +21,26 @@ struct AddView: View {
     let currencyFormat = Locale.current.currency?.identifier ?? "USD"
     
     var body: some View {
-        NavigationStack {
-            Form {
-                TextField("Name", text: $name)
-                
-                Picker("Type", selection: $type) {
-                    ForEach(types, id: \.self) {
-                        Text($0)
-                    }
+        Form {
+            Picker("Type", selection: $type) {
+                ForEach(types, id: \.self) {
+                    Text($0)
                 }
-                
-                TextField("Amount", value: $amount, format: .currency(code: currencyFormat))
-                    .keyboardType(.decimalPad)
             }
-            .navigationTitle("Add new expense")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+            
+            TextField("Amount", value: $amount, format: .currency(code: currencyFormat))
+                .keyboardType(.decimalPad)
+        }
+        .navigationTitle($name)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+            ToolbarItem {
                 Button("Save") {
                     let item = ExpenseItem(name: name, type: type, amount: amount)
                     expenses.items.append(item)
@@ -49,5 +53,7 @@ struct AddView: View {
 }
 
 #Preview {
-    AddView(expenses: Expenses())
+    NavigationStack {
+        AddView(expenses: Expenses())
+    }
 }
